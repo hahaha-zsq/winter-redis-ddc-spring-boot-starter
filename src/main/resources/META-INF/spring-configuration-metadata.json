@@ -1,0 +1,99 @@
+{
+  "groups": [
+    {
+      "name": "winter-redis-config",
+      "type": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$DynamicConfigCenterAutoProperties",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$DynamicConfigCenterAutoProperties"
+    },
+    {
+      "name": "winter-redis-config.redission",
+      "type": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "winter-redis-config.redission.connect-timeout",
+      "type": "java.lang.Integer",
+      "description": "连接超时时间（毫秒）",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": 10000
+    },
+    {
+      "name": "winter-redis-config.redission.host",
+      "type": "java.lang.String",
+      "description": "Redis主机地址",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": "localhost"
+    },
+    {
+      "name": "winter-redis-config.redission.idle-timeout",
+      "type": "java.lang.Integer",
+      "description": "空闲连接超时时间（毫秒）",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": 10000
+    },
+    {
+      "name": "winter-redis-config.redission.keep-alive",
+      "type": "java.lang.Boolean",
+      "description": "是否保持连接",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "winter-redis-config.redission.min-idle-size",
+      "type": "java.lang.Integer",
+      "description": "最小空闲连接数",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": 10
+    },
+    {
+      "name": "winter-redis-config.redission.password",
+      "type": "java.lang.String",
+      "description": "Redis密码",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties"
+    },
+    {
+      "name": "winter-redis-config.redission.ping-interval",
+      "type": "java.lang.Integer",
+      "description": "Ping连接间隔时间（毫秒）",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": 30000
+    },
+    {
+      "name": "winter-redis-config.redission.pool-size",
+      "type": "java.lang.Integer",
+      "description": "连接池大小",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": 64
+    },
+    {
+      "name": "winter-redis-config.redission.port",
+      "type": "java.lang.Integer",
+      "description": "Redis端口",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": 6379
+    },
+    {
+      "name": "winter-redis-config.redission.retry-attempts",
+      "type": "java.lang.Integer",
+      "description": "重试次数",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": 3
+    },
+    {
+      "name": "winter-redis-config.redission.retry-interval",
+      "type": "java.lang.Integer",
+      "description": "重试间隔时间（毫秒）",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": 1500
+    },
+    {
+      "name": "winter-redis-config.system",
+      "type": "java.lang.String",
+      "description": "系统名称",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$DynamicConfigCenterAutoProperties"
+    }
+  ],
+  "hints": []
+}
