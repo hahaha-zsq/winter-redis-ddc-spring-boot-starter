@@ -1,6 +1,7 @@
 package com.zsq.winter.redis.ddc.util;
 
 import org.springframework.core.io.ClassPathResource;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -40,8 +41,15 @@ public final class LuaScriptLoader {
         // 否则执行Lambda表达式加载资源并放入缓存
         return CACHE.computeIfAbsent(classpathResource, path -> {
             try (InputStream in = new ClassPathResource(path).getInputStream()) {
-                // 读取输入流的所有字节并转换为UTF-8编码的字符串
-                return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+                // 使用ByteArrayOutputStream手动读取输入流
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] data = new byte[1024];
+                while ((nRead = in.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                buffer.flush();
+                return new String(buffer.toByteArray(), StandardCharsets.UTF_8);
             } catch (Exception e) {
                 // 加载失败时抛出运行时异常，包含资源路径和原始异常信息
                 throw new RuntimeException("Load lua script failed: " + path, e);
