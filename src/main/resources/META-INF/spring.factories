@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration = \
-com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration, \
-com.zsq.winter.redis.ddc.config.DynamicConfigCenterBeanPostProcessor
