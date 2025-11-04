@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.github.hahaha-zsq</groupId>
+    <version>0.0.1</version>
+    <artifactId>winter-redis-ddc-spring-boot-starter</artifactId>
+
+
+    <packaging>jar</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>一个功能强大的 Redis 工具包，基于 Spring Boot 和 Redisson 构建，提供分布式锁、限流、布隆过滤器、动态配置中心等企业级功能。</description>
+    <url>https://github.com/hahaha-zsq/https://github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter.git</url>
+
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <spring.boot.version>2.6.11</spring.boot.version>
+        <redisson.version>3.26.0</redisson.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.6.11</version>
+    </parent>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>${redisson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>dadandiaoming</name>
+            <email>2595915122@qq.com</email>
+            <organization>Sonatype</organization>
+            <organizationUrl>https://www.sonatype.com</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git://github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter.git</connection>
+        <developerConnection>scm:git:ssh://github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter.git
+        </developerConnection>
+        <url>https://github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter</url>
+    </scm>
+
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <!--    Maven插件发布    -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.4.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <!--需要是我们之前定义的server的id，用来从server文件中获取仓库的用户名密码的配置-->
+                    <publishingServerId>dadandiaoming-maven</publishingServerId>
+                    <tokenAuth>true</tokenAuth>
+                    <!--需不需要自动发布，false就需要自己手动发布-->
+                    <autoPublish>true</autoPublish>
+                </configuration>
+            </plugin>
+
+
+            <!--            maven-source-plugin 是一个用于生成项目源代码的 Maven 插件，插件还可以用来将源代码作为附件附加到主 JAR 文件中。这通常是在发布项目的时候使用的，方便用户查看类的源代码-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--            maven-javadoc-plugin 将会生成项目的 JavaDoc 文档，并将其打包成一个 JAR 文件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <locale>zh_CN</locale>
+                            <encoding>UTF-8</encoding>
+                            <charset>UTF-8</charset>
+                            <doclint>none</doclint>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--            当执行 Maven 构建到达 verify 阶段时，maven-gpg-plugin 会使用 GPG 密钥对项目工件（如 JAR 文件）进行数字签名。这是为了保证工件的完整性和可追溯性，特别是在发布到远程仓库之前-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>net.nicoulaj.maven.plugins</groupId>
+                <artifactId>checksum-maven-plugin</artifactId>
+                <version>1.11</version>
+                <executions>
+                    <execution>
+                        <id>create-checksums</id>
+                        <goals>
+                            <goal>artifacts</goal>
+                        </goals>
+                        <configuration>
+                            <algorithms>
+                                <algorithm>MD5</algorithm>
+                                <algorithm>SHA-1</algorithm>
+                            </algorithms>
+                            <attachChecksums>true</attachChecksums>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-pom-checksums</id>
+                        <goals>
+                            <goal>files</goal>
+                        </goals>
+                        <configuration>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>*.pom</include>
+                                    </includes>
+                                </fileSet>
+                            </fileSets>
+                            <algorithms>
+                                <algorithm>MD5</algorithm>
+                                <algorithm>SHA-1</algorithm>
+                            </algorithms>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
