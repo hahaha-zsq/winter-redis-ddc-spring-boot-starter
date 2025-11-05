@@ -20,6 +20,13 @@
       "defaultValue": 10000
     },
     {
+      "name": "winter-redis-config.redission.database",
+      "type": "java.lang.Integer",
+      "description": "Redis数据库索引（0-15）",
+      "sourceType": "com.zsq.winter.redis.ddc.config.WinterRedisAutoConfiguration$RedisProperties",
+      "defaultValue": 0
+    },
+    {
       "name": "winter-redis-config.redission.host",
       "type": "java.lang.String",
       "description": "Redis主机地址",

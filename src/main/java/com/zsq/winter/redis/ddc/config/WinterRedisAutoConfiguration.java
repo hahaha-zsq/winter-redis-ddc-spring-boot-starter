@@ -64,7 +64,7 @@ public class WinterRedisAutoConfiguration {
     /**
      * Redis连接属性配置类
      * <p>
-     * 该类用于配置Redis连接属性，包括主机地址、端口、密码、连接池大小、最小空闲连接数、空闲连接超时、连接超时、重试次数、重试间隔时间、Ping连接间隔时间、是否保持连接。
+     * 该类用于配置Redis连接属性，包括主机地址、端口、数据库、密码、连接池大小、最小空闲连接数、空闲连接超时、连接超时、重试次数、重试间隔时间、Ping连接间隔时间、是否保持连接。
      * </p>
      */
     @Data
@@ -80,6 +80,11 @@ public class WinterRedisAutoConfiguration {
          * Redis端口
          */
         private Integer port = 6379;
+
+        /**
+         * Redis数据库索引（0-15）
+         */
+        private Integer database = 0;
 
         /**
          * Redis密码
@@ -147,6 +152,7 @@ public class WinterRedisAutoConfiguration {
 
         config.useSingleServer()
                 .setAddress("redis://" + properties.getHost() + ":" + properties.getPort())
+                .setDatabase(properties.getDatabase())
                 .setPassword(properties.getPassword().isEmpty() ? null : properties.getPassword())
                 .setConnectionPoolSize(properties.getPoolSize())
                 .setConnectionMinimumIdleSize(properties.getMinIdleSize())
@@ -301,16 +307,31 @@ public class WinterRedisAutoConfiguration {
         return topic;
     }
 
+    /**
+     * 创建RateLimiterService实例的Bean
+     * 当容器中不存在RateLimiterService类型的Bean时，该方法会被调用创建新的实例
+     *
+     * @param winterRedissionTemplate Redisson模板对象，用于实现限流功能的底层Redis操作
+     * @return RateLimiterService实例
+     */
     @Bean
     @ConditionalOnMissingBean
     public RateLimiterService rateLimiterService(WinterRedissionTemplate winterRedissionTemplate) {
         return new RateLimiterService(winterRedissionTemplate);
     }
 
+
+    /**
+     * 创建限流切面Bean
+     *
+     * @param rateLimiterService 限流服务实例，用于执行具体的限流逻辑
+     * @return RateLimitAspect 限流切面实例，用于处理@RateLimit注解
+     */
     @Bean
     @ConditionalOnMissingBean
     public RateLimitAspect rateLimitAspect(RateLimiterService rateLimiterService) {
         return new RateLimitAspect(rateLimiterService);
     }
+
 
 }

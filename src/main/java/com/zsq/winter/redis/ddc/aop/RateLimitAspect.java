@@ -129,13 +129,25 @@ public class RateLimitAspect {
             for (int i = 0; i < Math.min(paramNames.length, args.length); i++) {
                 ctx.setVariable(paramNames[i], args[i]);
             }
+        } else {
+            // 参数名称为空时的警告日志
+            log.warn("Parameter names not available for method: {}. " +
+                    "Please ensure maven-compiler-plugin is configured with <parameters>true</parameters>. " +
+                    "SpEL expression: {}", method.getName(), spel);
         }
 
         try {
             Object value = expression.getValue(ctx, Object.class);
             String resolved = value == null ? null : value.toString();
-            return (resolved == null || resolved.trim().isEmpty()) ? defaultKey(pjp) : resolved;
+            if (resolved == null || resolved.trim().isEmpty()) {
+                log.warn("SpEL expression '{}' resolved to null or empty for method: {}. Using default key.", 
+                        spel, method.getName());
+                return defaultKey(pjp);
+            }
+            return resolved;
         } catch (Exception e) {
+            log.error("Failed to parse SpEL expression '{}' for method: {}. Using default key. Error: {}", 
+                    spel, method.getName(), e.getMessage());
             return defaultKey(pjp);
         }
     }

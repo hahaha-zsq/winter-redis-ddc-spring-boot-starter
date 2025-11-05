@@ -74,10 +74,8 @@ Winter Redis DCC Spring Boot Starter 是一个企业级 Redis 工具包，它深
 
 ### 环境要求
 
-- JDK 11+
-- Spring Boot 2.6.11+
-- Redis 3.0+
-- Maven 3.6+
+- JDK 1.8
+- Spring Boot 2.6.11
 
 ### Maven 依赖
 
@@ -85,7 +83,7 @@ Winter Redis DCC Spring Boot Starter 是一个企业级 Redis 工具包，它深
 <dependency>
     <groupId>io.github.hahaha-zsq</groupId>
     <artifactId>winter-redis-ddc-spring-boot-starter</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.3</version>
 </dependency>
 ```
 
@@ -104,6 +102,7 @@ winter-redis-config:
   redission:
     host: localhost
     port: 6379
+    database: 0
     password: your-password  # 如果没有密码可以留空
     pool-size: 64            # 连接池大小
     min-idle-size: 10        # 最小空闲连接数
@@ -113,52 +112,6 @@ winter-redis-config:
     retry-interval: 1500     # 重试间隔时间（毫秒）
     ping-interval: 30000     # Ping 连接间隔时间（毫秒）
     keep-alive: true         # 是否保持连接
-```
-
-### 快速使用示例
-
-```java
-@RestController
-@RequestMapping("/demo")
-public class DemoController {
-    
-    @Autowired
-    private WinterRedissionTemplate redissionTemplate;
-    
-    @Autowired
-    private WinterRedisTemplate redisTemplate;
-    
-    // 1. 使用分布式锁
-    @GetMapping("/lock")
-    public String testLock() {
-        return redissionTemplate.executeWithLockReturn(
-            "my-lock", 
-            10, 30, TimeUnit.SECONDS,
-            () -> {
-                // 业务逻辑
-                return "执行成功";
-            }
-        );
-    }
-    
-    // 2. 使用限流注解
-    @RateLimit(
-        key = "#userId",
-        permitsPerSecond = 10,
-        algorithm = LimitAlgorithm.SLIDING_WINDOW
-    )
-    @GetMapping("/api")
-    public String api(String userId) {
-        return "API 调用成功";
-    }
-    
-    // 3. 使用缓存操作
-    @GetMapping("/cache")
-    public String testCache() {
-        redisTemplate.set("key", "value", 3600, TimeUnit.SECONDS);
-        return redisTemplate.get("key");
-    }
-}
 ```
 
 
@@ -177,8 +130,8 @@ graph TB
     end
     
     subgraph "AOP 切面层"
-        C[@RateLimit AOP<br/>限流切面]
-        D[@DCCValue AOP<br/>动态配置切面]
+        C[&#64RateLimit AOP<br/>限流切面]
+        D[&#64DCCValue AOP<br/>动态配置切面]
     end
     
     subgraph "自动配置层"
@@ -829,6 +782,9 @@ winter-redis-config:
     # Redis 服务器端口（必填）
     port: 6379
     
+    # Redis 数据库（可选，默认0）
+    database: 0
+    
     # Redis 密码（可选，如果没有密码可以留空或不配置）
     password: your-password
     
@@ -861,20 +817,21 @@ winter-redis-config:
 
 ### 配置项说明
 
-| 配置项 | 类型 | 必填 | 默认值 | 说明 |
-|-------|------|------|--------|------|
-| system | String | 是 | - | 系统名称，用于配置隔离 |
-| host | String | 是 | localhost | Redis服务器地址 |
-| port | Integer | 是 | 6379 | Redis服务器端口 |
-| password | String | 否 | - | Redis密码 |
-| pool-size | Integer | 否 | 64 | 连接池大小 |
-| min-idle-size | Integer | 否 | 10 | 最小空闲连接数 |
-| idle-timeout | Integer | 否 | 10000 | 空闲连接超时（毫秒） |
-| connect-timeout | Integer | 否 | 10000 | 连接超时（毫秒） |
-| retry-attempts | Integer | 否 | 3 | 重试次数 |
-| retry-interval | Integer | 否 | 1500 | 重试间隔（毫秒） |
-| ping-interval | Integer | 否 | 30000 | Ping间隔（毫秒） |
-| keep-alive | Boolean | 否 | true | 是否保持连接 |
+| 配置项             | 类型 | 必填 | 默认值       | 说明          |
+|-----------------|------|----|-----------|-------------|
+| system          | String | 是  | -         | 系统名称，用于配置隔离 |
+| host            | String | 是  | localhost | Redis服务器地址  |
+| port            | Integer | 是  | 6379      | Redis服务器端口  |
+| database        | Integer | 否  | 0         | Redis数据库    |
+| password        | String | 否  | -         | Redis密码     |
+| pool-size       | Integer | 否  | 64        | 连接池大小       |
+| min-idle-size   | Integer | 否  | 10        | 最小空闲连接数     |
+| idle-timeout    | Integer | 否  | 10000     | 空闲连接超时（毫秒）  |
+| connect-timeout | Integer | 否  | 10000     | 连接超时（毫秒）    |
+| retry-attempts  | Integer | 否  | 3         | 重试次数        |
+| retry-interval  | Integer | 否  | 1500      | 重试间隔（毫秒）    |
+| ping-interval   | Integer | 否  | 30000     | Ping间隔（毫秒）  |
+| keep-alive      | Boolean | 否  | true      | 是否保持连接      |
 
 ---
 
@@ -892,8 +849,11 @@ winter-redis-config:
 
 ## 📧 联系方式
 
-- GitHub: [https://github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter](https://github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter)
-- Maven Central: [https://search.maven.org/artifact/io.github.hahaha-zsq/winter-redis-ddc-spring-boot-starter](https://search.maven.org/artifact/io.github.hahaha-zsq/winter-redis-ddc-spring-boot-starter)
+- GitHub: [springBoot3版本](https://github.com/hahaha-zsq/winter-redis-ddc-spring-boot3-starter)
+- GitHub: [springBoo2版本](https://github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter)
+- Maven Central: [springBoot3版本](https://search.maven.org/artifact/io.github.hahaha-zsq/winter-redis-ddc-spring-boot3-starter)
+- Maven Central: [springBoot2版本](https://search.maven.org/artifact/io.github.hahaha-zsq/winter-redis-ddc-spring-boot-starter)
+
 
 ---
 
