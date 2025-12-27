@@ -305,8 +305,7 @@ public class WinterRedissionTemplate {
      */
     public <T> void set(String key, T value, long timeout, TimeUnit timeUnit) {
         // 将时间单位转换为Duration
-        Duration duration = Duration.ofMillis(timeUnit.toMillis(timeout));
-        redissonClient.getBucket(key).set(value, duration);
+        redissonClient.getBucket(key).set(value,timeout, timeUnit);
     }
     
     /**
