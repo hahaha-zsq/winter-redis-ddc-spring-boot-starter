@@ -1,0 +1,3051 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>winter-redis-ddc — Spring Boot Redis 工具包</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@500;800&family=Space+Grotesk:wght@300;400;500&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #000000;
+  --surface: #0A0A0A;
+  --card: #111111;
+  --border: rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.12);
+  --text-display: rgba(255,255,255,0.98);
+  --text-primary: rgba(255,255,255,0.88);
+  --text-secondary: rgba(255,255,255,0.58);
+  --text-tertiary: rgba(255,255,255,0.38);
+  --red: #D71921;
+  --green: #00A85D;
+  --amber: #D4A017;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.font-doto { font-family: 'Doto', sans-serif; }
+.font-mono { font-family: 'Space Mono', monospace; }
+.font-grotesk { font-family: 'Space Grotesk', sans-serif; }
+
+.container { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+
+/* ─── Navigation ─── */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 32px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0; z-index: 100;
+  background: var(--bg);
+}
+
+nav .logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+nav .logo svg { width: 18px; height: 18px; color: var(--red); }
+
+nav .logo strong { color: var(--text-primary); font-weight: 400; }
+
+nav .nav-links {
+  display: flex;
+  gap: 24px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+nav .nav-links a {
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+nav .nav-links a:hover { color: var(--text-primary); }
+
+/* ─── Hero ─── */
+.hero {
+  padding: 120px 0 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(255,255,255,0.015) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero .dot-grid {
+  position: absolute;
+  top: 40px; right: 48px;
+  display: grid;
+  grid-template-columns: repeat(16, 8px);
+  gap: 12px;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.hero .dot-grid span {
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 36px;
+  margin-bottom: 48px;
+}
+
+.hero-meta .meta-item {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.hero-meta .meta-item strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.hero h1 {
+  font-family: 'Doto', sans-serif;
+  font-weight: 800;
+  font-size: clamp(44px, 7.5vw, 88px);
+  line-height: 0.95;
+  color: var(--text-display);
+  letter-spacing: -0.02em;
+  max-width: 14ch;
+  margin-bottom: 24px;
+}
+
+.hero .subtitle {
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 300;
+  color: var(--text-secondary);
+  max-width: 56ch;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.hero .description {
+  font-size: 15px;
+  color: var(--text-tertiary);
+  max-width: 64ch;
+  line-height: 1.8;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 40px;
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease-out;
+}
+
+.btn-primary { background: #fff; color: #000; font-weight: 400; }
+.btn-primary:hover { background: rgba(255,255,255,0.85); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+}
+
+.btn-secondary:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.3); }
+
+.btn .arrow { font-family: 'Space Grotesk', sans-serif; font-size: 16px; }
+
+/* ─── Section ─── */
+section { padding: 80px 0; }
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label svg { width: 14px; height: 14px; }
+
+.section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 300;
+  font-size: 32px;
+  color: var(--text-display);
+  margin-bottom: 48px;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title svg { width: 28px; height: 28px; color: var(--text-tertiary); }
+
+.section-title em { font-style: normal; color: var(--text-tertiary); }
+
+.section-sub {
+  font-size: 15px;
+  color: var(--text-secondary);
+  max-width: 56ch;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+/* ─── Divider ─── */
+.divider { border: none; height: 1px; background: var(--border); margin: 0; }
+
+/* ─── Tech Stack ─── */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.tech-item {
+  background: var(--surface);
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tech-item .tech-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tech-item .tech-name svg { width: 14px; height: 14px; color: var(--text-tertiary); }
+
+.tech-item .tech-version {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-weight: 300;
+}
+
+.tech-item .tech-cat {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+/* ─── Project Overview ─── */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.overview-block {
+  background: var(--surface);
+  padding: 32px;
+}
+
+.overview-block.full { grid-column: 1 / -1; }
+
+.overview-block h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--text-display);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.overview-block h3 svg { width: 16px; height: 16px; color: var(--text-tertiary); }
+
+.overview-block p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.overview-block ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.overview-block ul li {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-left: 16px;
+  position: relative;
+}
+
+.overview-block ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+}
+
+/* ─── Capabilities Grid ─── */
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.cap-card {
+  background: var(--surface);
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cap-card .cap-number {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.card-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  margin-bottom: 6px;
+}
+
+.cap-card .cap-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--text-display);
+}
+
+.cap-card .cap-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.cap-card .cap-detail {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+  margin-top: 4px;
+}
+
+.cap-card .cap-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cap-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text-tertiary);
+}
+
+.cap-tag.green { color: var(--green); border-color: rgba(0,168,93,0.2); }
+.cap-tag.red { color: var(--red); border-color: rgba(215,25,33,0.15); }
+.cap-tag.amber { color: var(--amber); border-color: rgba(212,160,23,0.2); }
+
+/* ─── Package Structure ─── */
+.pkg-box {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+}
+
+.pkg-section { background: var(--surface); padding: 24px 28px; }
+
+.pkg-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pkg-section-path {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  color: var(--text-display);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pkg-section-path svg { width: 14px; height: 14px; color: var(--text-tertiary); }
+
+.pkg-section-role {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.pkg-class {
+  border: 1px solid var(--border);
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,0.01);
+}
+
+.pkg-class:last-child { margin-bottom: 0; }
+
+.pkg-class-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.pkg-class-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 400;
+}
+
+.pkg-class-lines {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  background: rgba(255,255,255,0.04);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+
+.pkg-class-target {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--green);
+  border: 1px solid rgba(0,168,93,0.15);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+
+.pkg-class-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.pkg-class-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pkg-class-meta .cap-tag {
+  font-size: 9px;
+  padding: 2px 8px;
+}
+
+/* ─── Architecture Sub-Sections ─── */
+.arch-sub-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--text-display);
+  margin-bottom: 8px;
+  margin-top: 40px;
+}
+
+.arch-sub-title:first-child { margin-top: 0; }
+
+.arch-sub-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* ─── Auto-Config Chain ─── */
+.config-chain {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.chain-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  gap: 12px;
+}
+
+.chain-row + .chain-row { border-top: 1px solid var(--border); }
+
+.chain-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  min-width: 24px;
+}
+
+.chain-step {
+  flex: 1;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chain-step svg { width: 14px; height: 14px; color: var(--text-tertiary); }
+
+.chain-detail {
+  flex: 2;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.chain-file {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-align: right;
+  min-width: 120px;
+}
+
+/* ─── Bean Dependency Map ─── */
+.dep-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.dep-node {
+  background: var(--surface);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dep-node .dep-bean {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dep-node .dep-bean svg { width: 14px; height: 14px; color: var(--text-tertiary); }
+
+.dep-node .dep-type {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.dep-node .dep-deps {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.dep-node .dep-deps strong {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* ─── Design Pattern Map ─── */
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.pattern-cell {
+  background: var(--surface);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pattern-cell .pat-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pattern-cell .pat-name svg { width: 14px; height: 14px; color: var(--text-tertiary); }
+
+.pattern-cell .pat-location {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.pattern-cell .pat-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Architecture Flow ─── */
+.arch-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--border);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.arch-layer {
+  flex: 1;
+  background: var(--surface);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  position: relative;
+  min-height: 110px;
+}
+
+.arch-layer + .arch-layer { border-left: 1px solid var(--border); }
+
+.arch-layer .layer-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.arch-layer .layer-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.arch-layer .layer-name svg { width: 14px; height: 14px; }
+
+.arch-layer .layer-items {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.arch-layer.highlight { background: rgba(255,255,255,0.02); }
+.arch-layer.highlight .layer-name { color: var(--text-display); }
+.arch-layer .layer-red { color: var(--red); }
+
+/* ─── Data Flow Diagram ─── */
+.flow-diagram {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.flow-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.flow-node {
+  flex: 1;
+  padding: 20px 16px;
+  text-align: center;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.015);
+  position: relative;
+}
+
+.flow-node.highlight {
+  background: rgba(255,255,255,0.03);
+  border-color: var(--border-strong);
+}
+
+.flow-node .fn-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.flow-node .fn-title svg { width: 14px; height: 14px; }
+
+.flow-node .fn-desc {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.flow-arrow {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  color: var(--text-tertiary);
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.flow-connector {
+  width: 100%; height: 24px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flow-connector::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; height: 1px;
+  background: var(--border-strong);
+}
+
+.flow-connector .dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Usage Steps ─── */
+.usage-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.usage-step {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  padding: 24px 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.usage-step .step-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+  min-width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.usage-step .step-num svg { width: 20px; height: 20px; }
+
+.usage-step .step-body { flex: 1; }
+
+.usage-step .step-body h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--text-display);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.usage-step .step-body h3 svg { width: 18px; height: 18px; color: var(--text-tertiary); }
+
+.usage-step .step-body .step-sub {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 8px;
+}
+
+.usage-step .step-body p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.usage-step .step-body pre {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.025);
+  padding: 18px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  line-height: 1.7;
+  tab-size: 2;
+}
+
+.usage-step .step-body code {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.04);
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+/* ─── Configuration Table ─── */
+.config-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border: 1px solid var(--border);
+}
+
+.config-table thead { background: var(--surface); }
+
+.config-table th {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  font-weight: 400;
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.config-table td {
+  padding: 14px 20px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+.config-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+.config-table td:first-child {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.config-table td:nth-child(2) {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.config-table td:nth-child(3) { color: var(--text-tertiary); font-size: 12px; }
+
+/* ─── Features Checklist ─── */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.feature-cell {
+  background: var(--surface);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feature-cell .fc-icon {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.feature-cell .fc-icon svg { width: 20px; height: 20px; }
+
+.feature-cell .fc-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--text-display);
+}
+
+.feature-cell .fc-desc {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* ─── Notes ─── */
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.note-item {
+  background: var(--surface);
+  padding: 20px 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.note-item .note-marker {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--red);
+  min-width: 24px;
+  line-height: 1.6;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 2px;
+}
+
+.note-item .note-marker svg { width: 16px; height: 16px; }
+
+.note-item .note-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.note-item .note-text strong { color: var(--text-primary); font-weight: 400; }
+
+/* ─── Footer ─── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+footer .footer-left, footer .footer-right {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+}
+
+footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+footer a:hover { color: var(--text-primary); }
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .cap-grid { grid-template-columns: 1fr; }
+  .feature-grid { grid-template-columns: repeat(2, 1fr); }
+  .overview-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .container { padding: 0 20px; }
+  .hero { padding: 80px 0 48px; }
+  .hero h1 { font-size: 48px; }
+  section { padding: 48px 0; }
+  .arch-flow { flex-direction: column; }
+  .arch-layer + .arch-layer { border-left: none; border-top: 1px solid var(--border); }
+  .tech-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-meta { flex-wrap: wrap; gap: 16px; }
+  .config-table { font-size: 12px; }
+  .config-table th, .config-table td { padding: 12px 14px; }
+  .usage-step { flex-direction: column; gap: 12px; }
+  .usage-step .step-num { min-width: auto; }
+  footer { flex-direction: column; gap: 12px; align-items: flex-start; }
+  nav .nav-links { display: none; }
+  .flow-row { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+  .feature-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .tech-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .btn { justify-content: center; }
+  .pkg-tree { font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── 导航栏 ─── -->
+<nav>
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg>
+    <strong>winter</strong>-redis-ddc
+  </div>
+  <div class="nav-links">
+    <a href="#overview">概览</a>
+    <a href="#stack">技术栈</a>
+    <a href="#features">核心能力</a>
+    <a href="#architecture">架构</a>
+    <a href="#algorithms">算法</a>
+    <a href="#flow">使用流程</a>
+    <a href="#config">配置</a>
+  </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- ─── 英雄区域 ─── -->
+<!-- ============================================================ -->
+<section class="hero">
+  <div class="container">
+    <div class="dot-grid">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="hero-meta">
+      <div class="meta-item">许可证<strong>Apache 2.0</strong></div>
+      <div class="meta-item">java 版本<strong>1.8+</strong></div>
+      <div class="meta-item">spring boot<strong>2.6.x / 3.x</strong></div>
+      <div class="meta-item">最新版本<strong>0.0.4</strong></div>
+      <div class="meta-item">maven central<strong><a href="https://central.sonatype.com/artifact/io.github.hahaha-zsq/winter-redis-ddc-spring-boot-starter" target="_blank" style="color:var(--text-secondary);text-decoration:none;border-bottom:1px solid var(--border-strong);">sonatype ↗</a></strong></div>
+    </div>
+
+    <h1>winter-redis-ddc</h1>
+    <p class="subtitle">开箱即用的 Spring Boot Redis 企业级工具包</p>
+    <p class="description">
+      基于 Redisson 与 Spring Data Redis 构建，提供声明式限流、分布式锁、动态配置中心、布隆过滤器、
+      Pub/Sub 消息、GEO 操作等企业级 Redis 能力。只需添加依赖并配置连接信息，
+      即可通过注解或模板 API 快速集成，无需繁琐的样板代码。
+    </p>
+
+    <div class="hero-actions">
+      <a href="https://github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter" class="btn btn-primary" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+      <a href="https://central.sonatype.com/artifact/io.github.hahaha-zsq/winter-redis-ddc-spring-boot-starter" class="btn btn-secondary" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Maven Central
+      </a>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 项目概览 ─── -->
+<!-- ============================================================ -->
+<section id="overview">
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      Introduction
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> 项目概览</h2>
+    <p class="section-sub">
+      winter-redis-ddc 是一个面向 Spring Boot 生态的 Redis Starter，旨在将复杂的 Redis 分布式能力
+      封装为简洁的声明式注解与 fluent 模板 API，让开发者专注于业务逻辑而非基础设施。
+    </p>
+
+    <div class="overview-grid">
+      <div class="overview-block">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          设计目标
+        </h3>
+        <ul>
+          <li>零配置开箱即用 — 添加依赖即完成集成</li>
+          <li>声明式编程 — 注解驱动，降低使用门槛</li>
+          <li>覆盖主流 Redis 场景 — 限流、锁、配置、过滤器、消息</li>
+          <li>基于 Lua 脚本保证原子性 — 限流与锁操作均为原子执行</li>
+          <li>运行时热更新 — 动态配置支持不重启修改参数</li>
+        </ul>
+      </div>
+
+      <div class="overview-block">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          核心特性一览
+        </h3>
+        <ul>
+          <li>三种限流算法：固定窗口 / 滑动窗口 / 令牌桶</li>
+          <li>五种分布式锁：普通锁 / Fair Lock / 读写锁 / MultiLock / RedLock</li>
+          <li>动态配置中心：@DCCValue + Redis Pub/Sub 热更新</li>
+          <li>布隆过滤器：概率性去重，支持本地缓存</li>
+          <li>模板封装：WinterRedisTemplate + WinterRedissionTemplate</li>
+          <li>Pub/Sub 消息：Topic / Pattern Topic / Reliable Topic</li>
+          <li>高级数据结构：GEO / HyperLogLog / BitSet / 原子计数器</li>
+          <li>分布式队列：BlockingQueue / DelayedQueue / PriorityQueue</li>
+        </ul>
+      </div>
+
+      <div class="overview-block">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          适用场景
+        </h3>
+        <ul>
+          <li>微服务 API 限流防护 — 使用 @RateLimit 注解保护接口</li>
+          <li>分布式定时任务互斥 — 利用分布式锁防止重复执行</li>
+          <li>功能开关动态调整 — 通过 @DCCValue 运行时切换降级策略</li>
+          <li>缓存穿透防护 — 使用布隆过滤器拦截不存在 key</li>
+          <li>实时消息推送 — 基于 Redis Pub/Sub 实现事件通知</li>
+          <li>用户签到/统计 — HyperLogLog + BitSet 高效统计</li>
+        </ul>
+      </div>
+
+      <div class="overview-block">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          项目坐标
+        </h3>
+        <ul>
+          <li>groupId: io.github.hahaha-zsq</li>
+          <li>artifactId: winter-redis-ddc-spring-boot-starter</li>
+          <li>version: 0.0.4</li>
+          <li>license: Apache License 2.0</li>
+          <li>repository: github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter</li>
+        <li>central: <a href="https://central.sonatype.com/artifact/io.github.hahaha-zsq/winter-redis-ddc-spring-boot-starter" target="_blank" style="color:var(--text-secondary);border-bottom:1px solid var(--border-strong);text-decoration:none;">central.sonatype.com ↗</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 技术栈 ─── -->
+<!-- ============================================================ -->
+<section id="stack">
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Technology
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> 技术栈</h2>
+    <p class="section-sub">
+      基于成熟的 Spring Boot 生态与 Redisson 高性能 Redis 客户端构建，
+      通过 Spring Boot Auto-Configuration 实现零代码集成。
+    </p>
+
+    <div class="tech-grid">
+      <div class="tech-item">
+        <span class="tech-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Java</span>
+        <span class="tech-version">1.8+ / 17+</span>
+        <span class="tech-cat">运行时</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> Spring Boot</span>
+        <span class="tech-version">2.6.11 parent</span>
+        <span class="tech-cat">应用框架</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 6 2.66 12 0V5"/><path d="M3 12c0 1.66 6 2.66 12 0"/></svg> Spring Data Redis</span>
+        <span class="tech-version">2.6.x</span>
+        <span class="tech-cat">数据访问</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Spring AOP</span>
+        <span class="tech-version">2.6.x</span>
+        <span class="tech-cat">切面编程</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Redisson</span>
+        <span class="tech-version">3.18.0</span>
+        <span class="tech-cat">Redis 客户端</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Lombok</span>
+        <span class="tech-version">1.18.x</span>
+        <span class="tech-cat">代码生成</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Jackson JSR310</span>
+        <span class="tech-version">2.13.x</span>
+        <span class="tech-cat">序列化</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Apache Commons Pool2</span>
+        <span class="tech-version">2.11.x</span>
+        <span class="tech-cat">连接池</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Maven</span>
+        <span class="tech-version">3.6+</span>
+        <span class="tech-cat">构建工具</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> Lua</span>
+        <span class="tech-version">—</span>
+        <span class="tech-cat">脚本语言</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 核心能力 ─── -->
+<!-- ============================================================ -->
+<section id="features">
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Capabilities
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 核心能力</h2>
+    <p class="section-sub">
+      starter 将 Spring Boot 自动装配与 Redis 分布式能力深度结合，
+      提供 8 大类 40+ 个开箱即用的功能点。
+    </p>
+
+    <div class="cap-grid">
+      <!-- 01 限流 -->
+      <div class="cap-card">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+        <span class="cap-number">01</span>
+        <h3 class="cap-title">@RateLimit 声明式限流</h3>
+        <p class="cap-desc">
+          通过注解即可为任意 Spring Bean 方法添加限流能力，无需侵入业务代码。
+          支持 SpEL 动态 Key 表达式。
+        </p>
+        <p class="cap-detail">
+          三种算法：固定窗口（Fixed Window）峰谷控制、滑动窗口（Sliding Window）平滑限制、
+          令牌桶（Token Bucket）应对突发流量。基于 Lua 脚本在 Redis 服务端原子执行。
+        </p>
+        <div class="cap-tags">
+          <span class="cap-tag green">Lua 原子执行</span>
+          <span class="cap-tag green">AOP 切面</span>
+          <span class="cap-tag">SpEL 动态 Key</span>
+        </div>
+      </div>
+
+      <!-- 02 分布式锁 -->
+      <div class="cap-card">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="11" width="8" height="7" rx="1"/><path d="M10 11V8a2 2 0 0 1 4 0v3"/></svg>
+        <span class="cap-number">02</span>
+        <h3 class="cap-title">分布式锁</h3>
+        <p class="cap-desc">
+          基于 Redisson 提供完整的分布式锁能力，覆盖多种锁语义场景。
+        </p>
+        <p class="cap-detail">
+          普通可重入锁、Fair Lock（公平锁）、ReadWriteLock（读写分离）、
+          MultiLock（多实例聚合锁）、RedLock（Redlock 算法）。
+          提供 <code>executeWithLock()</code> 模板方法自动管理加锁/解锁生命周期。
+        </p>
+        <div class="cap-tags">
+          <span class="cap-tag">可重入</span>
+          <span class="cap-tag">Redlock</span>
+          <span class="cap-tag green">模板方法</span>
+          <span class="cap-tag">超时控制</span>
+        </div>
+      </div>
+
+      <!-- 03 动态配置 -->
+      <div class="cap-card">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><circle cx="4" cy="14" r="2"/><circle cx="12" cy="8" r="2"/><circle cx="20" cy="12" r="2"/></svg>
+        <span class="cap-number">03</span>
+        <h3 class="cap-title">@DCCValue 动态配置中心</h3>
+        <p class="cap-desc">
+          运行时从 Redis 读取配置并注入到 Bean 字段，支持不重启实时更新。
+        </p>
+        <p class="cap-detail">
+          格式 <code>@DCCValue("key:defaultValue")</code>，启动时通过 BeanPostProcessor
+          扫描所有 Bean，从 Redis 读取并注入。运行时通过 Redis Pub/Sub 发布配置变更消息，
+          监听器自动更新字段值。支持 AOP 代理对象穿透。
+        </p>
+        <div class="cap-tags">
+          <span class="cap-tag green">运行时热更新</span>
+          <span class="cap-tag green">Pub/Sub 驱动</span>
+          <span class="cap-tag">BeanPostProcessor</span>
+        </div>
+      </div>
+
+      <!-- 04 布隆过滤器 -->
+      <div class="cap-card">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><line x1="20" y1="20" x2="15.5" y2="15.5"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <span class="cap-number">04</span>
+        <h3 class="cap-title">布隆过滤器</h3>
+        <p class="cap-desc">
+          概率性数据结构，高效判断元素是否存在，适合缓存穿透防护场景。
+        </p>
+        <p class="cap-detail">
+          提供 <code>getOrCreateBloomFilter()</code> 自动创建 / 获取过滤器，
+          <code>addToBloomFilter()</code> 添加元素、<code>containsInBloomFilter()</code>
+          判断存在性。支持指定预期容量与误判率，内置本地缓存加速判断。
+          提供 <code>deleteBloomFilter()</code> 清理功能。
+        </p>
+        <div class="cap-tags">
+          <span class="cap-tag">概率性</span>
+          <span class="cap-tag green">本地缓存</span>
+          <span class="cap-tag">O(1) 判断</span>
+        </div>
+      </div>
+
+      <!-- 05 模板 API -->
+      <div class="cap-card">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 6 2.66 12 0V5"/><path d="M3 12c0 1.66 6 2.66 12 0"/></svg>
+        <span class="cap-number">05</span>
+        <h3 class="cap-title">WinterRedisTemplate</h3>
+        <p class="cap-desc">
+          封装 Spring Data Redis 的 RedisTemplate，提供 fluent 风格的操作 API。
+          覆盖 String / Hash / List / Set / ZSet 五大基础数据结构，内置异常处理与日志。
+        </p>
+        <p class="cap-detail">
+          方法级异常捕获、常用操作的便捷封装（如 <code>hPutIfAbsent</code>、
+          <code>lPushIfPresent</code> 等）、批量操作的原子性保证。
+          适合基础的 Redis 操作场景。
+        </p>
+        <div class="cap-tags">
+          <span class="cap-tag">1820+ 行</span>
+          <span class="cap-tag green">异常处理</span>
+          <span class="cap-tag">fluent API</span>
+        </div>
+      </div>
+
+      <!-- 06 模板 API 2 -->
+      <div class="cap-card">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg>
+        <span class="cap-number">06</span>
+        <h3 class="cap-title">WinterRedissionTemplate</h3>
+        <p class="cap-desc">
+          封装 RedissonClient，提供 20+ 类高级 Redis 操作，覆盖分布式场景全部需求。
+        </p>
+        <p class="cap-detail">
+          包括分布式锁（5 种）、布隆过滤器、原子计数器（AtomicLong）、
+          信号量（Semaphore）、CountDownLatch、队列（Blocking / Delayed / Priority）、
+          Pub/Sub（Topic / Pattern / Reliable）、GEO 地理位置、
+          HyperLogLog 基数统计、BitSet 位图、批量操作、键空间管理（TTL / expire / persist）。
+        </p>
+        <div class="cap-tags">
+          <span class="cap-tag">1850+ 行</span>
+          <span class="cap-tag green">20+ 功能</span>
+          <span class="cap-tag">GEO / HLL</span>
+        </div>
+      </div>
+
+      <!-- 07 Pub/Sub -->
+      <div class="cap-card">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="cap-number">07</span>
+        <h3 class="cap-title">Pub/Sub 消息</h3>
+        <p class="cap-desc">
+          基于 Redisson 的 Topic 机制实现 Redis 发布订阅，支持多种消息模式。
+        </p>
+        <p class="cap-detail">
+          Topic（普通频道）、PatternTopic（通配符订阅）、ReliableTopic（可靠消息，
+          基于 Redisson ReliableTopic 保证消息不丢失）。
+          自动序列化/反序列化，泛型消息监听器，支持多消费者负载均衡。
+        </p>
+        <div class="cap-tags">
+          <span class="cap-tag">普通频道</span>
+          <span class="cap-tag">通配符</span>
+          <span class="cap-tag green">可靠消息</span>
+          <span class="cap-tag">泛型监听</span>
+        </div>
+      </div>
+
+      <!-- 08 高级结构 -->
+      <div class="cap-card">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <span class="cap-number">08</span>
+        <h3 class="cap-title">高级数据结构</h3>
+        <p class="cap-desc">
+          覆盖 Redis 全部高级数据结构的企业级封装，助力复杂业务场景。
+        </p>
+        <p class="cap-detail">
+          GEO 地理位置：<code>geoAdd</code> / <code>geoDist</code> / <code>geoRadius</code>。
+          HyperLogLog：<code>pfAdd</code> / <code>pfCount</code> 基数统计。
+          BitSet：<code>setBit</code> / <code>getBit</code> / <code>bitCount</code> 位运算。
+          原子计数器：<code>incrementAndGet</code> / <code>decrementAndGet</code>。
+          信号量：<code>trySetPermits</code> / <code>acquire</code> / <code>release</code>。
+        </p>
+        <div class="cap-tags">
+          <span class="cap-tag">GEO</span>
+          <span class="cap-tag">HyperLogLog</span>
+          <span class="cap-tag">BitSet</span>
+          <span class="cap-tag green">原子操作</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 功能全景 ─── -->
+<!-- ============================================================ -->
+<section>
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Feature Matrix
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> 功能全景</h2>
+    <p class="section-sub">
+      winter-redis-ddc 提供的全部功能一览，按类别组织。
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <span class="fc-name">限流算法</span>
+        <span class="fc-desc">固定窗口 / 滑动窗口 / 令牌桶，Lua 脚本原子执行，SpEL 动态 Key</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="11" width="8" height="7" rx="1"/><path d="M10 11V8a2 2 0 0 1 4 0v3"/></svg></span>
+        <span class="fc-name">分布式锁</span>
+        <span class="fc-desc">Reentrant / Fair / ReadWrite / MultiLock / RedLock + 模板方法</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><circle cx="4" cy="14" r="2"/><circle cx="12" cy="8" r="2"/><circle cx="20" cy="12" r="2"/></svg></span>
+        <span class="fc-name">动态配置</span>
+        <span class="fc-desc">@DCCValue 注解注入，Pub/Sub 热更新，AOP 代理穿透</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><line x1="20" y1="20" x2="15.5" y2="15.5"/></svg></span>
+        <span class="fc-name">布隆过滤器</span>
+        <span class="fc-desc">创建 / 添加 / 判断 / 删除，支持本地缓存加速</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+        <span class="fc-name">字符串操作</span>
+        <span class="fc-desc">set / get / getAndSet / getAndDelete / exists / delete</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span>
+        <span class="fc-name">哈希操作</span>
+        <span class="fc-desc">hPut / hGet / hDel / hExists / hGetAll / hKeys / hValues</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
+        <span class="fc-name">列表操作</span>
+        <span class="fc-desc">lPush / rPush / lPop / rPop / lRange / lSize / lIndex</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></span>
+        <span class="fc-name">集合操作</span>
+        <span class="fc-desc">sAdd / sRem / sIsMember / sMembers / sSize / sRandomMember</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <span class="fc-name">有序集合</span>
+        <span class="fc-desc">zAdd / zRem / zRange / zRevRange / zScore / zRank / count</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></span>
+        <span class="fc-name">原子计数器</span>
+        <span class="fc-desc">AtomicLong 封装，increment / decrement / addAndGet</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span>
+        <span class="fc-name">信号量</span>
+        <span class="fc-desc">Semaphore / CountDownLatch，executeWithSemaphore 模板</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+        <span class="fc-name">分布式队列</span>
+        <span class="fc-desc">BlockingQueue / DelayedQueue / PriorityQueue / Deque</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        <span class="fc-name">Pub/Sub 消息</span>
+        <span class="fc-desc">Topic / PatternTopic / ReliableTopic，泛型监听器</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
+        <span class="fc-name">GEO 地理</span>
+        <span class="fc-desc">geoAdd / geoDist / geoPos / geoRadius / geoHash</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        <span class="fc-name">HyperLogLog</span>
+        <span class="fc-desc">pfAdd / pfCount，基数统计，内存极省</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
+        <span class="fc-name">BitSet 位图</span>
+        <span class="fc-desc">setBit / getBit / bitCount / bit operations</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+        <span class="fc-name">键管理</span>
+        <span class="fc-desc">expire / persist / getExpire / deleteKeys / countExists</span>
+      </div>
+      <div class="feature-cell">
+        <span class="fc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+        <span class="fc-name">自动装配</span>
+        <span class="fc-desc">Spring Boot Auto-Configuration，spring.factories 注册</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 包结构 ─── -->
+<!-- ============================================================ -->
+<section>
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      Source
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg> 包结构</h2>
+    <p class="section-sub">
+      源码按功能分包，结构清晰。核心代码 17 个 Java 文件 + 3 个 Lua 脚本，总计约 4500 行。
+      各包职责明确，通过 Spring 依赖注入串联完整功能链路。
+    </p>
+
+    <div class="pkg-box">
+
+      <!-- annotation -->
+      <div class="pkg-section">
+        <div class="pkg-section-header">
+          <span class="pkg-section-path"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> annotation/</span>
+          <span class="pkg-section-role">声明式注解定义</span>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">DCCValue.java</span>
+            <span class="pkg-class-lines">~15 行</span>
+            <span class="pkg-class-target">FIELD / METHOD</span>
+          </div>
+          <div class="pkg-class-desc">运行时从 Redis 读取配置注入到 Bean 字段。格式 <code>@DCCValue("key:defaultValue")</code>，key 不存在时自动使用默认值并写入 Redis。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">@Retention(RUNTIME)</span>
+            <span class="cap-tag">@Target({FIELD, METHOD})</span>
+            <span class="cap-tag">value()</span>
+          </div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">RateLimit.java</span>
+            <span class="pkg-class-lines">~40 行</span>
+            <span class="pkg-class-target">METHOD</span>
+          </div>
+          <div class="pkg-class-desc">方法级声明式限流注解。支持 SpEL 动态 Key、三种算法切换、并发容量控制。限流触发时抛 <code>RateLimitException</code>。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">key()</span>
+            <span class="cap-tag">permitsPerSecond()</span>
+            <span class="cap-tag">windowSize() default 1</span>
+            <span class="cap-tag">algorithm() default FIXED_WINDOW</span>
+            <span class="cap-tag">capacity() default 0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- aop -->
+      <div class="pkg-section">
+        <div class="pkg-section-header">
+          <span class="pkg-section-path"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> aop/</span>
+          <span class="pkg-section-role">AOP 切面拦截</span>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">RateLimitAspect.java</span>
+            <span class="pkg-class-lines">~160 行</span>
+          </div>
+          <div class="pkg-class-desc">@RateLimit 的 AOP 实现。@Around 切面拦截注解方法，解析 SpEL Key 表达式，调用 RateLimiterService.tryAcquire()，根据结果放行或抛出 RateLimitException。内置 SpEL 表达式缓存（ConcurrentHashMap）。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">@Aspect</span>
+            <span class="cap-tag">@Component</span>
+            <span class="cap-tag">@Around("@annotation(rateLimit)")</span>
+            <span class="cap-tag">依赖: RateLimiterService</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- config -->
+      <div class="pkg-section">
+        <div class="pkg-section-header">
+          <span class="pkg-section-path"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> config/</span>
+          <span class="pkg-section-role">自动配置与 Bean 后处理</span>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">WinterRedisAutoConfiguration.java</span>
+            <span class="pkg-class-lines">~170 行</span>
+          </div>
+          <div class="pkg-class-desc">核心自动配置类。通过 @Configuration 声明 9 个 Bean：RedissonClient、RedisTemplate、WinterRedisTemplate、WinterRedissionTemplate、IDynamicConfigCenterService、DynamicConfigCenterAdjustListener、RTopic、RateLimiterService、RateLimitAspect。内嵌 @ConfigurationProperties 绑定配置。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">@Configuration</span>
+            <span class="cap-tag">@ConditionalOnClass/Bean/MissingBean</span>
+            <span class="cap-tag">@EnableConfigurationProperties</span>
+            <span class="cap-tag">@ConfigurationProperties</span>
+          </div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">DynamicConfigCenterBeanPostProcessor.java</span>
+            <span class="pkg-class-lines">~55 行</span>
+          </div>
+          <div class="pkg-class-desc">BeanPostProcessor 实现。在每个 Bean 初始化后（postProcessAfterInitialization），调用 DynamicConfigCenterService.proxyObject() 扫描 @DCCValue 字段并注入。通过 spring.factories 注册为独立 AutoConfiguration 以确保执行顺序。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">implements BeanPostProcessor</span>
+            <span class="cap-tag">依赖: IDynamicConfigCenterService</span>
+            <span class="cap-tag">postProcessAfterInitialization()</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- service -->
+      <div class="pkg-section">
+        <div class="pkg-section-header">
+          <span class="pkg-section-path"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> service/</span>
+          <span class="pkg-section-role">核心业务服务层</span>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">WinterRedisTemplate.java</span>
+            <span class="pkg-class-lines">~1820 行</span>
+          </div>
+          <div class="pkg-class-desc">Spring Data Redis 的模板封装。提供 fluent API 覆盖 String / Hash / List / Set / ZSet 五大数据结构。内置方法级异常捕获与日志输出，异常不会向上传播。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">@Component</span>
+            <span class="cap-tag">依赖: RedisTemplate</span>
+            <span class="cap-tag">@ConditionalOnBean</span>
+            <span class="cap-tag">五大数据结构全覆盖</span>
+          </div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">WinterRedissionTemplate.java</span>
+            <span class="pkg-class-lines">~1853 行</span>
+          </div>
+          <div class="pkg-class-desc">RedissonClient 的封装。提供 20+ 类高级操作：5 种分布式锁、布隆过滤器、原子计数器、信号量、队列、Pub/Sub、GEO、HyperLogLog、BitSet、键管理。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">@Component</span>
+            <span class="cap-tag">依赖: RedissonClient</span>
+            <span class="cap-tag">@ConditionalOnBean</span>
+            <span class="cap-tag">20+ 功能类别</span>
+          </div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">RateLimiterService.java</span>
+            <span class="pkg-class-lines">~111 行</span>
+          </div>
+          <div class="pkg-class-desc">限流核心服务。根据枚举选择 Lua 脚本，通过 Redisson RScript 执行并返回 Long 结果（1=放行，0=拒绝）。脚本使用 LongCodec.INSTANCE 编解码。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">@Service</span>
+            <span class="cap-tag">依赖: RedissonClient, LuaScriptLoader</span>
+            <span class="cap-tag">RScript.eval()</span>
+          </div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">DynamicConfigCenterService.java</span>
+            <span class="pkg-class-lines">~178 行</span>
+            <span class="pkg-class-target">implements IDynamicConfigCenterService</span>
+          </div>
+          <div class="pkg-class-desc">动态配置中心实现。扫描 Bean 的 @DCCValue 字段并初始化；通过 Redis Key 读写配置；通过 AopProxyUtils 穿透 AOP 代理；adjustAttributeValue() 实现字段反射更新。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">@Service</span>
+            <span class="cap-tag">依赖: RedisTemplate, StringRedisTemplate</span>
+            <span class="cap-tag">AopProxyUtils 代理穿透</span>
+          </div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">IDynamicConfigCenterService.java</span>
+            <span class="pkg-class-lines">~15 行</span>
+          </div>
+          <div class="pkg-class-desc">动态配置中心接口定义。声明 proxyObject() 与 adjustAttributeValue() 方法契约，便于扩展与测试替身。</div>
+        </div>
+      </div>
+
+      <!-- listener / entity / enums / expection / util -->
+      <div class="pkg-section">
+        <div class="pkg-section-header">
+          <span class="pkg-section-path"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> support/</span>
+          <span class="pkg-section-role">支撑层 — 监听器 / 实体 / 枚举 / 异常 / 工具</span>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">DynamicConfigCenterAdjustListener.java</span>
+            <span class="pkg-class-lines">~52 行</span>
+          </div>
+          <div class="pkg-class-desc">Redis Pub/Sub 消息监听器。实现 Redisson MessageListener&ltAttributeVO&gt，收到配置变更消息后调用 DynamicConfigCenterService.adjustAttributeValue() 完成字段热更新。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">@Component</span>
+            <span class="cap-tag">implements MessageListener</span>
+            <span class="cap-tag">依赖: IDynamicConfigCenterService</span>
+          </div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">AttributeVO.java</span>
+            <span class="pkg-class-lines">~10 行</span>
+          </div>
+          <div class="pkg-class-desc">配置变更消息的数据传输对象。包含 attribute（配置属性名）与 value（配置值）两个字段，JSON 序列化后通过 Redis Pub/Sub 传递。</div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">Constants.java</span>
+            <span class="pkg-class-lines">~15 行</span>
+          </div>
+          <div class="pkg-class-desc">Topic 命名常量。定义前缀 <code>DYNAMIC_CONFIG_CENTER_REDIS_TOPIC_</code>，静态方法 getTopic(application) 拼接完整 Topic 名。</div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">LimitAlgorithm.java</span>
+            <span class="pkg-class-lines">~10 行</span>
+          </div>
+          <div class="pkg-class-desc">限流算法枚举。定义 FIXED_WINDOW / SLIDING_WINDOW / TOKEN_BUCKET 三种算法常量，驱动 Lua 脚本选择。</div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">RateLimitException.java</span>
+            <span class="pkg-class-lines">~10 行</span>
+          </div>
+          <div class="pkg-class-desc">自定义限流异常。继承 RuntimeException，限流触发时由 RateLimitAspect 抛出，可在全局异常处理器中统一捕获。</div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">LuaScriptLoader.java</span>
+            <span class="pkg-class-lines">~59 行</span>
+          </div>
+          <div class="pkg-class-desc">Lua 脚本加载工具。从 classpath:lua/ 加载 .lua 文件，通过 ConcurrentHashMap 缓存已加载脚本内容，避免重复读取。</div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">@Component</span>
+            <span class="cap-tag">ConcurrentHashMap 缓存</span>
+            <span class="cap-tag">ClassPathResource 加载</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- resources -->
+      <div class="pkg-section">
+        <div class="pkg-section-header">
+          <span class="pkg-section-path"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> resources/</span>
+          <span class="pkg-section-role">资源配置文件</span>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">spring.factories</span>
+          </div>
+          <div class="pkg-class-desc">Spring Boot SPI 注册文件。声明 <code>org.springframework.boot.autoconfigure.EnableAutoConfiguration</code> 指向 WinterRedisAutoConfiguration 与 DynamicConfigCenterBeanPostProcessor，启动时自动装载。</div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">spring-configuration-metadata.json</span>
+          </div>
+          <div class="pkg-class-desc">IDE 配置元数据。为 application.yml 中的 winter-redis-config.* 属性提供补全提示与文档。</div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">lua/fixed_window.lua</span>
+            <span class="pkg-class-lines">~30 行</span>
+          </div>
+          <div class="pkg-class-desc">固定窗口限流脚本。以窗口时间戳为粒度计数，窗口内超过阈值则拒绝，窗口切换时重置计数器。</div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">lua/sliding_window.lua</span>
+            <span class="pkg-class-lines">~40 行</span>
+          </div>
+          <div class="pkg-class-desc">滑动窗口限流脚本。使用 ZSet 记录请求时间戳，通过 ZREMRANGEBYSCORE 移除过期记录，ZCARD 判断窗口内计数。</div>
+        </div>
+
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">lua/token_bucket.lua</span>
+            <span class="pkg-class-lines">~45 行</span>
+          </div>
+          <div class="pkg-class-desc">令牌桶限流脚本。以时间差计算应添加的令牌数，桶容量上限，消耗令牌后返回剩余令牌数。</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 系统架构 ─── -->
+<!-- ============================================================ -->
+<section id="architecture">
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      System Design
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> 架构设计</h2>
+    <p class="section-sub">
+      从应用层到存储层共 7 层架构，每一层职责单一、通过依赖注入与自动装配解耦。
+    </p>
+
+    <div class="arch-flow">
+      <div class="arch-layer highlight">
+        <span class="layer-label">第 1 层</span>
+        <span class="layer-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 应用层</span>
+        <span class="layer-items">@RateLimit 方法<br>@DCCValue 字段</span>
+      </div>
+      <div class="arch-layer">
+        <span class="layer-label">第 2 层</span>
+        <span class="layer-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> AOP 切面</span>
+        <span class="layer-items">RateLimitAspect<br>@Around 拦截</span>
+      </div>
+      <div class="arch-layer">
+        <span class="layer-label">第 3 层</span>
+        <span class="layer-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> 自动配置</span>
+        <span class="layer-items">WinterRedisAutoConfig<br>Bean 装配</span>
+      </div>
+      <div class="arch-layer">
+        <span class="layer-label">第 4 层</span>
+        <span class="layer-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> 业务服务</span>
+        <span class="layer-items">RateLimiterService<br>DCC Service</span>
+      </div>
+      <div class="arch-layer">
+        <span class="layer-label">第 5 层</span>
+        <span class="layer-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 6 2.66 12 0V5"/><path d="M3 12c0 1.66 6 2.66 12 0"/></svg> 模板封装</span>
+        <span class="layer-items">WinterRedisTemplate<br>WinterRedissionTemplate</span>
+      </div>
+      <div class="arch-layer">
+        <span class="layer-label">第 6 层</span>
+        <span class="layer-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> 客户端</span>
+        <span class="layer-items">RedisTemplate<br>RedissonClient</span>
+      </div>
+      <div class="arch-layer">
+        <span class="layer-label">第 7 层</span>
+        <span class="layer-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg> 存储层</span>
+        <span class="layer-items">Redis Server<br>内存数据存储</span>
+      </div>
+    </div>
+
+    <p class="section-sub" style="margin-top:24px;margin-bottom:0;">
+      限流与动态配置两大核心流程的数据流转如下。
+    </p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── 限流数据流 ─── -->
+<section>
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Data Flow
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 限流流程</h2>
+    <p class="section-sub">
+      @RateLimit 注解的完整执行链路：请求进入 → 切面拦截 → Key 解析 →
+      Lua 执行 → 结果判断 → 放行或拒绝。
+    </p>
+
+    <div class="flow-diagram">
+      <div class="flow-row">
+        <div class="flow-node highlight">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 客户端请求</div>
+          <div class="fn-desc">HTTP / RPC 调用</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> @RateLimit 方法</div>
+          <div class="fn-desc">createOrder(userId)</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node highlight">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> RateLimitAspect</div>
+          <div class="fn-desc">@Around 拦截</div>
+        </div>
+      </div>
+
+      <div class="flow-connector"><span class="dot"></span></div>
+
+      <div class="flow-row">
+        <div class="flow-node">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> SpEL 解析</div>
+          <div class="fn-desc">key="#userId" → 实际值</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node highlight">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> RateLimiterService</div>
+          <div class="fn-desc">tryAcquire()</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> Lua 脚本执行</div>
+          <div class="fn-desc">固定/滑动/令牌桶</div>
+        </div>
+      </div>
+
+      <div class="flow-connector"><span class="dot"></span></div>
+
+      <div class="flow-row">
+        <div class="flow-node highlight">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg> Redis Server</div>
+          <div class="fn-desc">原子执行 → 返回 1/0</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node" style="flex:0.5;">
+          <div class="fn-title" style="color:var(--green);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 1 → 放行</div>
+          <div class="fn-desc">执行业务方法</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node" style="flex:0.5;">
+          <div class="fn-title" style="color:var(--red);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> 0 → 拒绝</div>
+          <div class="fn-desc">RateLimitException</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── 动态配置数据流 ─── -->
+<section>
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Data Flow
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 动态配置流程</h2>
+    <p class="section-sub">
+      @DCCValue 的完整生命周期：应用启动注入 → 运行时订阅 → 配置变更推送 → 字段自动更新。
+    </p>
+
+    <div class="flow-diagram">
+      <div class="flow-row">
+        <div class="flow-node highlight">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 应用启动</div>
+          <div class="fn-desc">BeanPostProcessor 扫描</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><circle cx="4" cy="14" r="2"/><circle cx="12" cy="8" r="2"/><circle cx="20" cy="12" r="2"/></svg> @DCCValue 字段发现</div>
+          <div class="fn-desc">"key:defaultValue" 解析</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 初始化注入</div>
+          <div class="fn-desc">从 Redis 读取 / 使用默认值</div>
+        </div>
+      </div>
+
+      <div class="flow-connector"><span class="dot"></span></div>
+
+      <div class="flow-row">
+        <div class="flow-node highlight">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 订阅 Topic</div>
+          <div class="fn-desc">DYNAMIC_CONFIG_CENTER_TOPIC_{system}</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 等待变更</div>
+          <div class="fn-desc">Redis Pub/Sub 监听</div>
+        </div>
+      </div>
+
+      <div class="flow-connector"><span class="dot"></span></div>
+
+      <div class="flow-row">
+        <div class="flow-node">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 配置变更发布</div>
+          <div class="fn-desc">AttributeVO {attribute, value}</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node highlight">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> AdjustListener</div>
+          <div class="fn-desc">onMessage() 接收</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node">
+          <div class="fn-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> 字段反射更新</div>
+          <div class="fn-desc">Field.set() 注入新值</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── 自动配置架构 ─── -->
+<section>
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Auto-Config
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> 自动装配架构</h2>
+    <p class="section-sub">
+      Spring Boot 自动配置的核心链路：<code>spring.factories</code> SPI 发现 → AutoConfiguration 条件装配 → 9 个 Bean 注入容器。
+      所有 Bean 通过 <code>@ConditionalOnMissingBean</code> 保障可覆盖性，使用者可自定义替换任一组件。
+    </p>
+
+    <div class="config-chain">
+      <div class="chain-row">
+        <span class="chain-num">01</span>
+        <span class="chain-step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> SPI 发现</span>
+        <span class="chain-detail">Spring Boot 读取 spring.factories，发现两个 AutoConfiguration 类</span>
+        <span class="chain-file">spring.factories</span>
+      </div>
+      <div class="chain-row">
+        <span class="chain-num">02</span>
+        <span class="chain-step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> 配置绑定</span>
+        <span class="chain-detail">@ConfigurationProperties 读取 <code>winter-redis-config.*</code> 属性，绑定到 RedissionProperties</span>
+        <span class="chain-file">WinterRedisAutoConfiguration</span>
+      </div>
+      <div class="chain-row">
+        <span class="chain-num">03</span>
+        <span class="chain-step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> RedissonClient</span>
+        <span class="chain-detail">根据主机/端口/密码/连接池等配置创建 RedissonClient Bean</span>
+        <span class="chain-file">WinterRedisAutoConfiguration</span>
+      </div>
+      <div class="chain-row">
+        <span class="chain-num">04</span>
+        <span class="chain-step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 6 2.66 12 0V5"/><path d="M3 12c0 1.66 6 2.66 12 0"/></svg> RedisTemplate</span>
+        <span class="chain-detail">创建 Jackson2JsonRedisSerializer 序列化的 RedisTemplateBean</span>
+        <span class="chain-file">WinterRedisAutoConfiguration</span>
+      </div>
+      <div class="chain-row">
+        <span class="chain-num">05</span>
+        <span class="chain-step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 6 2.66 12 0V5"/><path d="M3 12c0 1.66 6 2.66 12 0"/></svg> WinterRedisTemplate</span>
+        <span class="chain-detail">@ConditionalOnBean(RedisTemplate.class) + @ConditionalOnMissingBean，包装 RedisTemplate</span>
+        <span class="chain-file">WinterRedisAutoConfiguration</span>
+      </div>
+      <div class="chain-row">
+        <span class="chain-num">06</span>
+        <span class="chain-step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> WinterRedissionTemplate</span>
+        <span class="chain-detail">@ConditionalOnBean(RedissonClient.class) + @ConditionalOnMissingBean，包装 RedissonClient</span>
+        <span class="chain-file">WinterRedisAutoConfiguration</span>
+      </div>
+      <div class="chain-row">
+        <span class="chain-num">07</span>
+        <span class="chain-step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><circle cx="4" cy="14" r="2"/><circle cx="12" cy="8" r="2"/><circle cx="20" cy="12" r="2"/></svg> DCC Service</span>
+        <span class="chain-detail">创建 DynamicConfigCenterService Bean，无条件创建不可覆盖</span>
+        <span class="chain-file">WinterRedisAutoConfiguration</span>
+      </div>
+      <div class="chain-row">
+        <span class="chain-num">08</span>
+        <span class="chain-step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> 限流组件</span>
+        <span class="chain-detail">@ConditionalOnMissingBean 创建 RateLimiterService + RateLimitAspect</span>
+        <span class="chain-file">WinterRedisAutoConfiguration</span>
+      </div>
+      <div class="chain-row">
+        <span class="chain-num">09</span>
+        <span class="chain-step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Bean 后处理</span>
+        <span class="chain-detail">DynamicConfigCenterBeanPostProcessor 拦截所有 Bean 初始化，扫描 @DCCValue 字段</span>
+        <span class="chain-file">DynamicConfigCenterBeanPostProcessor</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── Bean 依赖关系 ─── -->
+<section>
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Dependencies
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Bean 依赖关系</h2>
+    <p class="section-sub">
+      Spring 容器中各 Bean 之间的构造器注入依赖关系。箭头方向表示「A 依赖 B」。
+      全为构造器注入，保障不可变性与测试便利性。
+    </p>
+
+    <div class="dep-grid">
+      <div class="dep-node">
+        <span class="dep-bean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> RateLimitAspect</span>
+        <span class="dep-type">AOP 切面</span>
+        <div class="dep-deps">
+          <strong>&rarr; 依赖</strong><br>
+          RateLimiterService
+        </div>
+      </div>
+
+      <div class="dep-node">
+        <span class="dep-bean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> RateLimiterService</span>
+        <span class="dep-type">限流服务</span>
+        <div class="dep-deps">
+          <strong>&rarr; 依赖</strong><br>
+          RedissonClient (RScript)<br>
+          LuaScriptLoader
+        </div>
+      </div>
+
+      <div class="dep-node">
+        <span class="dep-bean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 6 2.66 12 0V5"/><path d="M3 12c0 1.66 6 2.66 12 0"/></svg> WinterRedisTemplate</span>
+        <span class="dep-type">Redis 模板</span>
+        <div class="dep-deps">
+          <strong>&rarr; 依赖</strong><br>
+          RedisTemplate&lt;String, Object&gt;
+        </div>
+      </div>
+
+      <div class="dep-node">
+        <span class="dep-bean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> WinterRedissionTemplate</span>
+        <span class="dep-type">Redisson 模板</span>
+        <div class="dep-deps">
+          <strong>&rarr; 依赖</strong><br>
+          RedissonClient
+        </div>
+      </div>
+
+      <div class="dep-node">
+        <span class="dep-bean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><circle cx="4" cy="14" r="2"/><circle cx="12" cy="8" r="2"/><circle cx="20" cy="12" r="2"/></svg> DynamicConfigCenterService</span>
+        <span class="dep-type">配置中心服务</span>
+        <div class="dep-deps">
+          <strong>&rarr; 依赖</strong><br>
+          RedisTemplate&lt;String, Object&gt;<br>
+          StringRedisTemplate
+        </div>
+      </div>
+
+      <div class="dep-node">
+        <span class="dep-bean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> DynamicConfigCenterBeanPostProcessor</span>
+        <span class="dep-type">Bean 后处理器</span>
+        <div class="dep-deps">
+          <strong>&rarr; 依赖</strong><br>
+          IDynamicConfigCenterService
+        </div>
+      </div>
+
+      <div class="dep-node">
+        <span class="dep-bean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> DynamicConfigCenterAdjustListener</span>
+        <span class="dep-type">配置监听器</span>
+        <div class="dep-deps">
+          <strong>&rarr; 依赖</strong><br>
+          IDynamicConfigCenterService
+        </div>
+      </div>
+
+      <div class="dep-node">
+        <span class="dep-bean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> LuaScriptLoader</span>
+        <span class="dep-type">工具类</span>
+        <div class="dep-deps">
+          <strong>&rarr; 依赖</strong><br>
+          无（独立工具类）
+        </div>
+      </div>
+
+      <div class="dep-node">
+        <span class="dep-bean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> RedissonClient</span>
+        <span class="dep-type">Redis 客户端</span>
+        <div class="dep-deps">
+          <strong>&rarr; 依赖</strong><br>
+          Redisson 配置（host/port/pool）
+        </div>
+      </div>
+
+      <div class="dep-node">
+        <span class="dep-bean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 6 2.66 12 0V5"/><path d="M3 12c0 1.66 6 2.66 12 0"/></svg> RedisTemplate</span>
+        <span class="dep-type">Spring Data 模板</span>
+        <div class="dep-deps">
+          <strong>&rarr; 依赖</strong><br>
+          Jedis/Lettuce 连接工厂
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── 设计模式 ─── -->
+<section>
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Patterns
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> 设计模式分布</h2>
+    <p class="section-sub">
+      winter-redis-ddc 在架构中运用了 8 种经典设计模式，分布在各个层次中。
+    </p>
+
+    <div class="pattern-grid">
+      <div class="pattern-cell">
+        <span class="pat-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Auto-Configuration</span>
+        <span class="pat-location">config/ + spring.factories</span>
+        <span class="pat-desc">Spring Boot Starter 标准模式。通过 spring.factories SPI 注册 AutoConfiguration，@ConditionalOn* 控制 Bean 创建条件，@EnableConfigurationProperties 绑定外部配置。</span>
+      </div>
+
+      <div class="pattern-cell">
+        <span class="pat-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Template Method / Facade</span>
+        <span class="pat-location">WinterRedisTemplate, WinterRedissionTemplate</span>
+        <span class="pat-desc">封装底层 Redis 客户端（RedisTemplate / RedissonClient）的复杂 API，提供统一且简化的外观接口。方法级异常捕获避免异常传播。</span>
+      </div>
+
+      <div class="pattern-cell">
+        <span class="pat-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Strategy</span>
+        <span class="pat-location">enums/LimitAlgorithm + lua/*.lua</span>
+        <span class="pat-desc">LimitAlgorithm 枚举定义三种限流算法策略，RateLimiterService 根据枚举值选择对应的 Lua 脚本执行。新增算法只需添加枚举值 + Lua 脚本。</span>
+      </div>
+
+      <div class="pattern-cell">
+        <span class="pat-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> AOP (Aspect-Oriented)</span>
+        <span class="pat-location">aop/RateLimitAspect</span>
+        <span class="pat-desc">通过 @Around 切面实现声明式限流的横切关注点。开发者只需 @RateLimit 注解即可获得限流能力，业务代码零侵入。</span>
+      </div>
+
+      <div class="pattern-cell">
+        <span class="pat-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> BeanPostProcessor</span>
+        <span class="pat-location">DynamicConfigCenterBeanPostProcessor</span>
+        <span class="pat-desc">Spring 容器扩展点。在每个 Bean 初始化后拦截，扫描 @DCCValue 字段并注入配置值。通过 AopProxyUtils 穿透 AOP 代理。</span>
+      </div>
+
+      <div class="pattern-cell">
+        <span class="pat-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Observer / Pub-Sub</span>
+        <span class="pat-location">listener/ + Redisson RTopic</span>
+        <span class="pat-desc">Redis Pub/Sub 实现配置变更的发布-订阅模式。DynamicConfigCenterAdjustListener 作为观察者接收变更消息，无需轮询。</span>
+      </div>
+
+      <div class="pattern-cell">
+        <span class="pat-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> Lua Scripting</span>
+        <span class="pat-location">RateLimiterService + lua/</span>
+        <span class="pat-desc">限流逻辑通过 Lua 脚本在 Redis 服务端原子执行，避免并发竞争条件。脚本通过 LuaScriptLoader 缓存，避免重复加载。</span>
+      </div>
+
+      <div class="pattern-cell">
+        <span class="pat-name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Cache-Aside (Memoization)</span>
+        <span class="pat-location">RateLimitAspect (SpEL 缓存), LuaScriptLoader</span>
+        <span class="pat-desc">SpEL 解析结果与 Lua 脚本内容均通过 ConcurrentHashMap 缓存，避免重复计算与 I/O，提升运行时性能。</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 限流算法详解 ─── -->
+<!-- ============================================================ -->
+<section id="algorithms">
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Algorithms
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> 限流算法详解</h2>
+    <p class="section-sub">
+      @RateLimit 支持三种限流算法，分别适用于不同流量特征。所有算法均通过 Lua 脚本在 Redis 服务端
+      原子执行，无并发安全问题。
+    </p>
+
+    <div class="pkg-box">
+      <!-- Fixed Window -->
+      <div class="pkg-section">
+        <div class="pkg-section-header">
+          <span class="pkg-section-path">固定窗口</span>
+          <span class="pkg-section-role">LimitAlgorithm.FIXED_WINDOW</span>
+        </div>
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">fixed_window.lua</span>
+            <span class="pkg-class-lines">~30 行</span>
+            <span class="pkg-class-target">Redis Key 前缀: ratelimit:fw:</span>
+          </div>
+          <div class="pkg-class-desc">
+            以固定时间窗口（如 1 秒）为粒度进行计数。窗口内请求数未达上限则放行并计数 +1，
+            已达上限则直接拒绝。窗口切换时（以窗口起始时间戳为 key）自动重置计数器。
+            <strong>特点：</strong>实现简单、性能最优，但窗口边界存在流量突刺（两倍峰值）。
+          </div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">INCR 计数</span>
+            <span class="cap-tag">EXPIRE 自动过期</span>
+            <span class="cap-tag amber">边界突刺</span>
+            <span class="cap-tag green">性能最佳</span>
+          </div>
+          <pre style="margin-top:12px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-secondary);background:rgba(255,255,255,0.02);padding:16px;border:1px solid var(--border);line-height:1.6;overflow-x:auto;">local key       = KEYS[1]
+local limit      = tonumber(ARGV[1])
+local windowMs   = tonumber(ARGV[2])
+local now        = tonumber(ARGV[3])
+local windowKey  = key .. ':' .. math.floor(now / windowMs) .. ':'
+local count      = redis.call('INCR', windowKey)
+if count == 1 then redis.call('PEXPIRE', windowKey, windowMs) end
+if count > limit then return 0 else return 1 end</pre>
+        </div>
+      </div>
+
+      <!-- Sliding Window -->
+      <div class="pkg-section">
+        <div class="pkg-section-header">
+          <span class="pkg-section-path">滑动窗口</span>
+          <span class="pkg-section-role">LimitAlgorithm.SLIDING_WINDOW</span>
+        </div>
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">sliding_window.lua</span>
+            <span class="pkg-class-lines">~40 行</span>
+            <span class="pkg-class-target">Redis Key 前缀: ratelimit:sw:</span>
+          </div>
+          <div class="pkg-class-desc">
+            使用 Redis ZSet（有序集合）记录每个请求的时间戳。每次请求时通过 ZREMRANGEBYSCORE
+            移除窗口之外的过期记录，ZCARD 统计当前窗口内的请求数量。
+            <strong>特点：</strong>彻底消除边界突刺，限流曲线平滑，但内存占用稍高（需存储时间戳）。
+            适合对流量平滑度要求较高的场景。
+          </div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">ZSet 时间戳记录</span>
+            <span class="cap-tag">ZREMRANGEBYSCORE 清理</span>
+            <span class="cap-tag">ZCARD 计数</span>
+            <span class="cap-tag green">零突刺</span>
+          </div>
+          <pre style="margin-top:12px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-secondary);background:rgba(255,255,255,0.02);padding:16px;border:1px solid var(--border);line-height:1.6;overflow-x:auto;">local key       = KEYS[1]
+local limit      = tonumber(ARGV[1])
+local windowMs   = tonumber(ARGV[2])
+local now        = tonumber(ARGV[3])
+local windowKey  = key .. ':' .. math.floor(now / 1000) .. ':'
+local minScore   = now - windowMs
+redis.call('ZREMRANGEBYSCORE', windowKey, '-inf', minScore)
+local count      = redis.call('ZCARD', windowKey)
+if count >= limit then return 0 end
+redis.call('ZADD', windowKey, now, now .. ':' .. math.random())
+redis.call('PEXPIRE', windowKey, windowMs)
+return 1</pre>
+        </div>
+      </div>
+
+      <!-- Token Bucket -->
+      <div class="pkg-section">
+        <div class="pkg-section-header">
+          <span class="pkg-section-path">令牌桶</span>
+          <span class="pkg-section-role">LimitAlgorithm.TOKEN_BUCKET</span>
+        </div>
+        <div class="pkg-class">
+          <div class="pkg-class-header">
+            <span class="pkg-class-name">token_bucket.lua</span>
+            <span class="pkg-class-lines">~45 行</span>
+            <span class="pkg-class-target">Redis Key 前缀: ratelimit:tb:</span>
+          </div>
+          <div class="pkg-class-desc">
+            以恒定速率向桶中添加令牌（基于时间差计算），桶满则停止添加。每次请求消耗一个令牌，
+            令牌不足则拒绝。支持 capacity 参数设置桶容量（突发上限）。
+            <strong>特点：</strong>允许一定程度的突发流量（由 capacity 控制），同时保证长期平均速率。
+            最接近实际业务需求的限流模型，但实现稍复杂。
+          </div>
+          <div class="pkg-class-meta">
+            <span class="cap-tag">令牌生成速率控制</span>
+            <span class="cap-tag">桶容量突发</span>
+            <span class="cap-tag green">支持突发</span>
+            <span class="cap-tag">长期平均限流</span>
+          </div>
+          <pre style="margin-top:12px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-secondary);background:rgba(255,255,255,0.02);padding:16px;border:1px solid var(--border);line-height:1.6;overflow-x:auto;">local key       = KEYS[1]
+local rate       = tonumber(ARGV[1])         -- permitsPerSecond
+local capacity   = tonumber(ARGV[2])
+local now        = tonumber(ARGV[3])
+local lastKey    = key .. ':last'
+local tokensKey  = key .. ':tokens'
+local lastTime   = redis.call('GET', lastKey)
+local tokens     = redis.call('GET', tokensKey)
+if lastTime == false then lastTime = now end
+if tokens == false then tokens = capacity end
+tokens = tonumber(tokens)
+local elapsed   = math.max(0, now - tonumber(lastTime))
+tokens = math.min(capacity, tokens + elapsed * rate / 1000)
+if tokens < 1 then return 0 end
+tokens = tokens - 1
+redis.call('SET', lastKey, now)
+redis.call('SET', tokensKey, tokens)
+return 1</pre>
+        </div>
+      </div>
+
+      <!-- Comparison -->
+      <div class="pkg-section">
+        <div class="pkg-section-header">
+          <span class="pkg-section-path">算法对比</span>
+          <span class="pkg-section-role">Algorithms Comparison</span>
+        </div>
+        <div class="pkg-class">
+          <table class="config-table" style="margin-bottom:0;">
+            <thead>
+              <tr>
+                <th>维度</th>
+                <th>固定窗口</th>
+                <th>滑动窗口</th>
+                <th>令牌桶</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>流量突刺</td>
+                <td style="color:var(--red);">窗口边界 2x</td>
+                <td style="color:var(--green);">无</td>
+                <td style="color:var(--green);">可控（capacity）</td>
+              </tr>
+              <tr>
+                <td>内存占用</td>
+                <td style="color:var(--green);">低（1 key）</td>
+                <td style="color:var(--amber);">中（ZSet）</td>
+                <td style="color:var(--green);">低（2 key）</td>
+              </tr>
+              <tr>
+                <td>执行性能</td>
+                <td style="color:var(--green);">最优（1 INCR）</td>
+                <td style="color:var(--amber);">一般（Z* 操作）</td>
+                <td style="color:var(--green);">优秀（GET/SET）</td>
+              </tr>
+              <tr>
+                <td>突发支持</td>
+                <td style="color:var(--red);">不支持</td>
+                <td style="color:var(--red);">不支持</td>
+                <td style="color:var(--green);">支持</td>
+              </tr>
+              <tr>
+                <td>实现复杂度</td>
+                <td style="color:var(--green);">最低</td>
+                <td style="color:var(--amber);">中等</td>
+                <td style="color:var(--amber);">中等</td>
+              </tr>
+              <tr>
+                <td>适用场景</td>
+                <td>简单限流、网关</td>
+                <td>平滑限流、API</td>
+                <td>突发流量、业务</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 使用流程 ─── -->
+<!-- ============================================================ -->
+<section id="flow">
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Quick Start
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 使用流程</h2>
+    <p class="section-sub">
+      从添加依赖到使用全部功能，只需 5 步即可完成集成。
+    </p>
+
+    <div class="usage-steps">
+      <!-- Step 1 -->
+      <div class="usage-step">
+        <span class="step-num"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+        <div class="step-body">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> 添加 Maven 依赖</h3>
+          <span class="step-sub">在 pom.xml 中加入以下依赖 <a href="https://central.sonatype.com/artifact/io.github.hahaha-zsq/winter-redis-ddc-spring-boot-starter" target="_blank" style="color:var(--text-tertiary);border-bottom:1px solid var(--border-strong);text-decoration:none;font-family:'Space Mono',monospace;font-size:11px;">Maven Central ↗</a></span>
+          <pre>&lt;dependency&gt;
+  &lt;groupId&gt;io.github.hahaha-zsq&lt;/groupId&gt;
+  &lt;artifactId&gt;winter-redis-ddc-spring-boot-starter&lt;/artifactId&gt;
+  &lt;version&gt;0.0.4&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="usage-step">
+        <span class="step-num"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+        <div class="step-body">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> 配置 application.yml</h3>
+          <span class="step-sub">设置 Redis 连接参数与系统名称</span>
+          <pre>winter-redis-config:
+  system: my-service                   # 系统名称，用于配置隔离
+  redission:
+    host: localhost                    # Redis 地址
+    port: 6379                         # Redis 端口
+    password: your-password            # Redis 密码（可选）
+    database: 0                        # 数据库索引
+    pool-size: 64                      # 连接池大小
+    connect-timeout: 10000             # 连接超时（ms）</pre>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="usage-step">
+        <span class="step-num"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <div class="step-body">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> 声明式限流 — @RateLimit</h3>
+          <span class="step-sub">在任意 Spring Bean 方法上添加注解即可限流</span>
+          <pre>@RateLimit(
+    key = "#userId + ':' + #orderType",
+    permitsPerSecond = 5,
+    windowSize = 1,
+    algorithm = LimitAlgorithm.TOKEN_BUCKET,
+    capacity = 10
+)
+public String createOrder(String userId, String orderType) {
+    // 限流保护的业务逻辑
+    return orderService.create(userId, orderType);
+}</pre>
+          <p>
+            key 支持 SpEL 表达式动态生成；algorithm 可选 FIXED_WINDOW / SLIDING_WINDOW / TOKEN_BUCKET；
+            限流触发时抛出 <code>RateLimitException</code>（继承 RuntimeException）。
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="usage-step">
+        <span class="step-num"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><circle cx="4" cy="14" r="2"/><circle cx="12" cy="8" r="2"/><circle cx="20" cy="12" r="2"/></svg></span>
+        <div class="step-body">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><circle cx="4" cy="14" r="2"/><circle cx="12" cy="8" r="2"/><circle cx="20" cy="12" r="2"/></svg> 动态配置 — @DCCValue</h3>
+          <span class="step-sub">运行时从 Redis 读取配置，支持自动热更新</span>
+          <pre>@Component
+public class OrderService {
+
+    @DCCValue("order.downgrade:0")
+    private String downgradeSwitch;
+
+    @DCCValue("order.timeout:3000")
+    private String timeoutMs;
+
+    public void process() {
+        // 无需重启，修改 Redis 中 order.downgrade 的值即可生效
+        if ("1".equals(downgradeSwitch)) {
+            // 降级逻辑
+        }
+    }
+}</pre>
+          <p>
+            格式 <code>@DCCValue("key:defaultValue")</code>，key 对应 Redis 中的 <code>{system}_key</code>。
+            通过 Redis Pub/Sub 发布 <code>{"attribute":"order.downgrade","value":"1"}</code> 触发热更新，
+            所有运行实例自动接收变更。
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="usage-step">
+        <span class="step-num"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
+        <div class="step-body">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> 模板 API 编程式使用</h3>
+          <span class="step-sub">注入 WinterRedisTemplate / WinterRedissionTemplate</span>
+          <pre>@Autowired
+private WinterRedisTemplate winterRedisTemplate;
+
+@Autowired
+private WinterRedissionTemplate winterRedissionTemplate;
+
+// ─── 分布式锁 ───
+winterRedissionTemplate.executeWithLock("order:lock:123",
+    100, 30, TimeUnit.SECONDS, () -> {
+    // 获得锁后执行，自动释放
+    processOrder(123);
+});
+
+// ─── 布隆过滤器 ───
+RBloomFilter&lt;Object&gt; filter =
+    winterRedissionTemplate.getOrCreateBloomFilter("user:bloom", 100000, 0.01);
+filter.add("user_9527");
+boolean exists = filter.contains("user_9527");
+
+// ─── Pub/Sub 发布消息 ───
+winterRedissionTemplate.publish("order:channel", orderEvent);
+
+// ─── GEO 地理坐标 ───
+winterRedissionTemplate.geoAdd("stores", 116.397, 39.908, "store_001");
+List&lt;Object&gt; nearby = winterRedissionTemplate.geoRadius("stores",
+    116.40, 39.91, 5, RedisGeoCommands.DistanceUnit.KILOMETERS);
+
+// ─── 原子计数器 ───
+long count = winterRedissionTemplate.incrementAndGet("visitor:count", 1);</pre>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="usage-step">
+        <span class="step-num"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
+        <div class="step-body">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 运行时配置热更新</h3>
+          <span class="step-sub">通过 Redis 发布消息动态修改 @DCCValue 字段</span>
+          <pre>// Redis 发布消息到 Topic: DYNAMIC_CONFIG_CENTER_REDIS_TOPIC_{system}
+// 消息体为 AttributeVO JSON 格式：
+
+{
+    "attribute": "order.downgrade",
+    "value": "1"
+}
+
+// 所有运行中的服务实例将自动：
+//   1. 接收消息（DynamicConfigCenterAdjustListener）
+//   2. 更新 Redis 中的值
+//   3. 通过反射注入到对应 Bean 字段
+//   4. 在下一个请求中即可使用新值
+
+// 注意：动态配置不影响 @Value 注解，仅作用于 @DCCValue 字段</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 配置属性 ─── -->
+<!-- ============================================================ -->
+<section id="config">
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      Reference
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> 配置属性</h2>
+    <p class="section-sub">
+      application.yml 中支持的全部配置项，默认值与说明。
+    </p>
+
+    <table class="config-table">
+      <thead>
+        <tr>
+          <th>属性名</th>
+          <th>默认值</th>
+          <th>说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>winter-redis-config.system</td>
+          <td>—（必填）</td>
+          <td>系统名称，用于动态配置的 key 命名空间隔离</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.host</td>
+          <td>localhost</td>
+          <td>Redis 服务器地址</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.port</td>
+          <td>6379</td>
+          <td>Redis 服务器端口</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.database</td>
+          <td>0</td>
+          <td>Redis 数据库索引</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.password</td>
+          <td>—</td>
+          <td>Redis 连接密码</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.pool-size</td>
+          <td>64</td>
+          <td>连接池最大连接数</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.min-idle-size</td>
+          <td>10</td>
+          <td>最小空闲连接数</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.idle-timeout</td>
+          <td>10000</td>
+          <td>空闲连接超时时间（毫秒）</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.connect-timeout</td>
+          <td>10000</td>
+          <td>连接超时时间（毫秒）</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.retry-attempts</td>
+          <td>3</td>
+          <td>命令执行重试次数</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.retry-interval</td>
+          <td>1500</td>
+          <td>重试间隔（毫秒）</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.ping-interval</td>
+          <td>30000</td>
+          <td>心跳 PING 间隔（毫秒）</td>
+        </tr>
+        <tr>
+          <td>winter-redis-config.redission.keep-alive</td>
+          <td>true</td>
+          <td>是否启用 TCP Keep-Alive</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 常见问题 ─── -->
+<!-- ============================================================ -->
+<section>
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      FAQ
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> 常见问题</h2>
+    <p class="section-sub">
+      使用 winter-redis-ddc 过程中可能遇到的典型问题及解答。
+    </p>
+
+    <div class="notes-list">
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>如何自定义 RedissonClient 配置？</strong><br>
+          直接在 <code>application.yml</code> 的 <code>winter-redis-config.redission.*</code> 下配置即可。
+          若需完全自定义，声明自己的 <code>RedissonClient</code> Bean 并使用
+          <code>@Primary</code> 注解，Starter 的 <code>@ConditionalOnMissingBean</code> 会自动跳过默认创建。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>@RateLimit 支持类级别注解吗？</strong><br>
+          当前只支持方法级别。若需整个类限流，可在每个方法上添加相同 key 的 @RateLimit，
+          或自行基于 <code>RateLimiterService</code> 封装类级别拦截器。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>@DCCValue 字段更新后，如何触发回调？</strong><br>
+          当前版本配置更新后仅注入新值，不触发回调方法。若需在值变更时执行逻辑，
+          建议在业务方法中主动判断字段值，或通过 AOP 监听字段变更。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>分布式锁超时后锁自动释放，业务还没执行完怎么办？</strong><br>
+          Redisson 提供了 Watch Dog 机制：默认 leaseTime 为 -1 时，Redisson 会启动后台线程
+          定期（leaseTime/3）续期锁的过期时间。使用 <code>executeWithLock()</code> 时建议不传
+          leaseTime 或传 -1 以启用 Watch Dog 自动续期。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>Sliding Window 限流的内存占用如何优化？</strong><br>
+          滑动窗口使用 ZSet 存储时间戳，每个请求对应一个 ZSet 元素。建议结合业务设置合理的时间窗口
+          大小（如 1s 而非 1h），窗口越小内存占用越低。也可通过降低请求频率减少 ZSet 基数。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>布隆过滤器的误判率如何影响内存？</strong><br>
+          误判率每降低一个数量级（如 1% → 0.1%），所需内存约增加 50%。公式：
+          <code>bit数 ≈ -insertions * ln(falseProbability) / (ln2)^2</code>。
+          建议根据业务容忍度合理设置，如缓存穿透防护场景 1% 误判率通常可接受。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>Spring Boot 3.x 兼容吗？</strong><br>
+          Starter 基于 Boot 2.6.11 构建，但坐标不绑定 Boot 版本。
+          在 Spring Boot 3.x 项目中引用时，需排除传递依赖的 <code>spring-boot-starter-data-redis</code>
+          并引入与 Boot 3.x 兼容的版本。建议自行验证后再用于生产。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>如何贡献代码或报告问题？</strong><br>
+          项目托管在 <a href="https://github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter" target="_blank" style="color:var(--text-secondary);border-bottom:1px solid var(--border-strong);text-decoration:none;">GitHub</a>。
+          欢迎提交 Issue 报告 Bug、Feature Request，或直接提交 Pull Request。
+          代码风格遵循阿里巴巴 Java 开发手册，提交前请确保通过现有测试。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 注意事项 ─── -->
+<!-- ============================================================ -->
+<section>
+  <div class="container">
+    <p class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Caveats
+    </p>
+    <h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> 注意事项</h2>
+
+    <div class="notes-list">
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>限流 Redis Key 命名规则：</strong>
+          <code>ratelimit:{算法前缀}:{key}</code>，其中 <code>fw</code> = fixed window，
+          <code>sw</code> = sliding window，<code>tb</code> = token bucket。
+          多个应用共享 Redis 时注意 key 冲突，建议通过 SpEL 表达式加入业务前缀。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>动态配置 Key 格式：</strong>
+          <code>{system}_{attributeName}</code>。例如 system=<code>my-service</code>、
+          attribute=<code>downgradeSwitch</code> 时，Redis 中的 key 为
+          <code>my-service_downgradeSwitch</code>。首次访问不存在时自动使用
+          <code>@DCCValue("key:default")</code> 中的默认值并写入 Redis。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>配置变更 Topic 命名：</strong>
+          <code>DYNAMIC_CONFIG_CENTER_REDIS_TOPIC_{system}</code>。
+          通过 Redisson RTopic 发布 <code>AttributeVO</code> JSON 消息即可触发全实例热更新。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>AOP 代理兼容性：</strong>
+          <code>DynamicConfigCenterService</code> 使用 Redisson 的
+          <code>AopProxyUtils</code> 工具类来穿透 Spring AOP 代理（JDK 动态代理 &amp; CGLIB），
+          确保 <code>@DCCValue</code> 字段注入对于被 <code>@Transactional</code>、
+          <code>@Cacheable</code> 等注解的方法也正常工作。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>限流注解 SpEL 缓存：</strong>
+          <code>RateLimitAspect</code> 内部会缓存解析后的 SpEL 表达式
+          （使用 <code>ConcurrentHashMap</code>），避免每次请求重复解析。
+          缓存 key 为切点方法全限定名。如果遇到动态 SpEL 不生效问题，检查表达式是否正确。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>Spring Boot 版本兼容：</strong>
+          Starter 基于 2.6.11 构建，但兼容 Spring Boot 3.x（需自行测试）。
+          对于 Spring Boot 3.x 项目，可能需要调整 Jackson 相关依赖版本。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>Lua 脚本加载机制：</strong>
+          三个限流 Lua 脚本（<code>fixed_window.lua</code> / <code>sliding_window.lua</code> /
+          <code>token_bucket.lua</code>）存放在 <code>resources/lua/</code> 目录下，
+          通过 <code>LuaScriptLoader</code> 在第一次使用时加载并缓存到 <code>ConcurrentHashMap</code>。
+          脚本使用 <code>LongCodec.INSTANCE</code> 编解码，保证返回 Long 类型结果。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>线程安全：</strong>
+          所有服务类均设计为无状态 Spring Bean，可安全地在多线程环境下使用。
+          WinterRedissionTemplate 中的 <code>RLock</code> / <code>RSemaphore</code> / <code>RCountDownLatch</code>
+          等 Redisson 对象本身就具备线程安全性。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>分布式锁使用建议：</strong>
+          <code>executeWithLock()</code> 方法会自动处理加锁、等待、解锁、异常释放。
+          建议优先使用模板方法而非手动调用 <code>lock()</code> / <code>unlock()</code>，
+          避免忘记解锁导致死锁。锁的 watch dog 自动续期由 Redisson 内部处理。
+        </div>
+      </div>
+      <div class="note-item">
+        <span class="note-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="note-text">
+          <strong>布隆过滤器参数选择：</strong>
+          <code>getOrCreateBloomFilter(name, expectedInsertions, falseProbability)</code>
+          中，<code>expectedInsertions</code> = 预期插入量，<code>falseProbability</code> = 期望误判率（0~1）。
+          falseProbability 越小占用内存越大。例如 0.01（1% 误判率）与 0.001（0.1%）的内存差异约 50%。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<!-- ─── 页脚 ─── -->
+<!-- ============================================================ -->
+<footer>
+  <div class="footer-left">
+    <a href="https://github.com/hahaha-zsq/winter-redis-ddc-spring-boot-starter" target="_blank">GitHub</a>
+    <span style="margin:0 12px;opacity:0.3;">/</span>
+    <span>Apache License 2.0</span>
+  </div>
+  <div class="footer-right">
+    winter-redis-ddc &middot; v0.0.4 &middot; Built with Nothing Design
+  </div>
+</footer>
+
+</body>
+</html>
